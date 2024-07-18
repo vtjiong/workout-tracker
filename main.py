@@ -1,7 +1,8 @@
 import requests
 from datetime import datetime
-application_id= "Your Application ID"
-application_key = "Your Application Key"
+import os
+application_id= f"{os.environ.get('APP_ID')}"
+application_key = f"{os.environ.get('APP_KEY')}"
 endpoint = "https://trackapi.nutritionix.com/v2/natural/exercise"
 headers = {
     'x-app-id' : application_id,
@@ -18,10 +19,13 @@ parameters = {
 response = requests.post(url=endpoint, headers=headers, json=parameters)
 result = response.json()["exercises"]
 print(result)
-sheety_endpoint="Your End Point"
+sheety_endpoint=f"{os.environ.get('sheety')}"
+headers = {
+    "Authorization": f"Bearer {os.environ.get('token')}"
+}
 for x in result:
     workout = {
-       "workout": {
+       "sheet1": {
             "date":datetime.now().strftime("%m/%d/%Y"),
             "time":datetime.now().strftime("%H:%M:%S"),
             "exercise":x["name"].title(),
@@ -29,9 +33,6 @@ for x in result:
             "calories":x["nf_calories"]
         }
     }
-    response = requests.post(url=sheety_endpoint, json=workout)
-
-
-
+    response = requests.post(url=sheety_endpoint, json=workout,headers=headers)
 # response.json() parses the response from strings to a valid json data structure using a lists and stuff,
 # while response.text is still a string
